@@ -10,7 +10,7 @@ COPY schema /schema
 
 RUN corepack enable
 
-RUN --mount=type=cache,id=agentgateway-ui-pnpm,target=/pnpm/store \
+RUN --mount=type=cache,id=s/f92aeb61-d341-42e9-ac1a-20b0f244ee1d-/pnpm/store,target=/pnpm/store \
     pnpm install --frozen-lockfile --store-dir=/pnpm/store
 
 RUN pnpm build
@@ -19,8 +19,8 @@ FROM docker.io/library/rust:1.100.0-trixie AS musl-builder
 
 ARG TARGETARCH
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+RUN --mount=type=cache,id=s/f92aeb61-d341-42e9-ac1a-20b0f244ee1d-/var/cache/apt,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=s/f92aeb61-d341-42e9-ac1a-20b0f244ee1d-/var/lib/apt,target=/var/lib/apt,sharing=locked \
     rm -f /etc/apt/apt.conf.d/docker-clean && \
     echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache && \
     apt-get update && apt-get install -y --no-install-recommends \
@@ -69,12 +69,12 @@ COPY catalog ./catalog
 COPY --from=node /app/dist ./ui/dist
 
 RUN \
-    --mount=type=cache,id=cargo,target=/usr/local/cargo/registry \
-    --mount=type=cache,id=cargo-git,target=/usr/local/cargo/git \
+    --mount=type=cache,id=s/f92aeb61-d341-42e9-ac1a-20b0f244ee1d-/usr/local/cargo/registry,target=/usr/local/cargo/registry \
+    --mount=type=cache,id=s/f92aeb61-d341-42e9-ac1a-20b0f244ee1d-/usr/local/cargo/git,target=/usr/local/cargo/git \
     cargo fetch --locked
-RUN --mount=type=cache,target=/app/target \
-    --mount=type=cache,id=cargo,target=/usr/local/cargo/registry  \
-    --mount=type=cache,id=cargo-git,target=/usr/local/cargo/git \
+RUN --mount=type=cache,id=s/f92aeb61-d341-42e9-ac1a-20b0f244ee1d-/app/target,target=/app/target \
+    --mount=type=cache,id=s/f92aeb61-d341-42e9-ac1a-20b0f244ee1d-/usr/local/cargo/registry,target=/usr/local/cargo/registry \
+    --mount=type=cache,id=s/f92aeb61-d341-42e9-ac1a-20b0f244ee1d-/usr/local/cargo/git,target=/usr/local/cargo/git \
     <<EOF
 export VERSION="${VERSION}"
 export GIT_REVISION="${GIT_REVISION}"
